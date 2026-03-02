@@ -1,14 +1,16 @@
 /// Imports
-use crate::refs::{EnvRef, MutRef, Ref};
-use tick_ast::stmt::Block;
-use tick_common::io::IO;
-use tick_lex::token::Span;
+use crate::{
+    interpreter::Interpreter,
+    refs::{EnvRef, MutRef, Ref},
+};
 use std::{
     any::Any,
     collections::HashMap,
     fmt::{Debug, Display},
     rc::Rc,
 };
+use tick_ast::stmt::Block;
+use tick_lex::token::Span;
 
 /// Native function value
 #[derive(Clone, Debug)]
@@ -16,7 +18,7 @@ pub struct Native {
     /// Function parameters arity
     pub arity: usize,
     /// Native function
-    pub function: Box<fn(&dyn IO, &Span, Vec<Value>) -> Value>,
+    pub function: Box<fn(&mut Interpreter, &Span, Vec<Value>) -> Value>,
 }
 
 /// Function value

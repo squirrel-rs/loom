@@ -9,16 +9,16 @@ use crate::{
         value::{Module, Value},
     },
 };
+use miette::NamedSource;
+use std::{cell::RefCell, sync::Arc};
 use tick_ast::stmt::Block;
 use tick_common::{bail, io::IO};
 use tick_lex::{lexer::Lexer, token::Span};
 use tick_parse::parser::Parser;
 use tick_sema::Analyzer;
-use miette::NamedSource;
-use std::{cell::RefCell, sync::Arc};
 
 /// Interpreter
-pub struct Interpreter<I: IO> {
+pub struct Interpreter<'io> {
     /// Builtins environment
     pub(crate) builtins: Builtins,
     /// Current environment
@@ -26,13 +26,13 @@ pub struct Interpreter<I: IO> {
     /// Modules registry
     pub(crate) modules: Modules,
     /// IO
-    pub(crate) io: I,
+    pub(crate) io: &'io dyn IO,
 }
 
 /// Implementation
-impl<I: IO> Interpreter<I> {
+impl<'io> Interpreter<'io> {
     /// Creates new interpreter
-    pub fn new(io: I) -> Self {
+    pub fn new(io: &'io dyn IO) -> Self {
         Interpreter {
             builtins: builtins::provide_builtins(),
             env: EnvRef::new(RefCell::new(Environment::default())),

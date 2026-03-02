@@ -13,9 +13,9 @@ use std::{cell::RefCell, rc::Rc};
 pub fn print() -> Ref<Native> {
     return Ref::new(Native {
         arity: 1,
-        function: Box::new(|io, _, values| {
-            io.output(&format!("{}", values.get(0).unwrap()));
-            io.flush();
+        function: Box::new(|rt, _, values| {
+            rt.io.output(&format!("{}", values.get(0).unwrap()));
+            rt.io.flush();
             Value::Null
         }),
     });
@@ -25,9 +25,9 @@ pub fn print() -> Ref<Native> {
 pub fn println() -> Ref<Native> {
     return Ref::new(Native {
         arity: 1,
-        function: Box::new(|io, _, values| {
-            io.output(&format!("{}\n", values.get(0).unwrap()));
-            io.flush();
+        function: Box::new(|rt, _, values| {
+            rt.io.output(&format!("{}\n", values.get(0).unwrap()));
+            rt.io.flush();
             Value::Null
         }),
     });
@@ -37,7 +37,7 @@ pub fn println() -> Ref<Native> {
 pub fn readln() -> Ref<Native> {
     return Ref::new(Native {
         arity: 0,
-        function: Box::new(|io, _, _| Value::String(io.input())),
+        function: Box::new(|rt, _, _| Value::String(rt.io.input())),
     });
 }
 

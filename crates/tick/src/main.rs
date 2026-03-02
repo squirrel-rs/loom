@@ -47,6 +47,6 @@ fn main() {
 
     // Interpreting
     let code = io.read(&path);
-    let mut interpreter = Interpreter::new(io);
+    let mut interpreter = Interpreter::new(&io);
     let _ = interpreter.interpret_module(name, &code);
 }

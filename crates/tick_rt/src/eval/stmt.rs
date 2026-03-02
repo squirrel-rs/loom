@@ -9,17 +9,17 @@ use crate::{
         value::{Callable, Closure, Function, Method, Type, Value},
     },
 };
+use std::{cell::RefCell, collections::HashMap};
 use tick_ast::{
     atom::{self, AssignOp, BinaryOp},
     expr::Expression,
     stmt::{Block, Statement, UsageKind},
 };
-use tick_common::{bail, io::IO};
+use tick_common::bail;
 use tick_lex::token::Span;
-use std::{cell::RefCell, collections::HashMap};
 
 /// Implementation
-impl<I: IO> Interpreter<I> {
+impl<'io> Interpreter<'io> {
     /// Executes while statement
     fn exec_while(&mut self, span: &Span, condition: &Expression, block: &Block) -> Flow<()> {
         // Evaluating condition value

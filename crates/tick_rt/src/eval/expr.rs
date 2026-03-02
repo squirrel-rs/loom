@@ -15,11 +15,11 @@ use tick_ast::{
     expr::Expression,
     stmt::Block,
 };
-use tick_common::{bail, bug, io::IO};
+use tick_common::{bail, bug};
 use tick_lex::token::Span;
 
 /// Implementation
-impl<I: IO> Interpreter<I> {
+impl<'io> Interpreter<'io> {
     /// Evaluates literal expression
     pub(crate) fn eval_lit(&self, lit: &Lit) -> Flow<Value> {
         // Matching literal
@@ -354,7 +354,7 @@ impl<I: IO> Interpreter<I> {
         self.env = EnvRef::new(RefCell::new(Environment::default()));
 
         // Executing
-        let result = (*native.function)(&mut self.io, span, args);
+        let result = (*native.function)(self, span, args);
 
         // Popping environment
         self.env = previous;
