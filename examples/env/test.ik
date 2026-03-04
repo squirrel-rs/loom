@@ -16,3 +16,4 @@ println(env.os);
 println(env.family);
 println(env.dll);
 println(env.exe);
+println(env.args().to_string());

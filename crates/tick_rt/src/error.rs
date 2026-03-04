@@ -1,9 +1,9 @@
 /// Imports
 use crate::rt::value::Value;
-use tick_ast::atom::{BinaryOp, UnaryOp};
 use miette::{Diagnostic, NamedSource, SourceSpan};
 use std::sync::Arc;
 use thiserror::Error;
+use tick_ast::atom::{BinaryOp, UnaryOp};
 
 /// Unsafe `Send` + `Sync` implementations.
 unsafe impl Send for Value {}

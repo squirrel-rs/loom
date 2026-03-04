@@ -174,7 +174,7 @@ fn set_method() -> Method {
                                                 vec[idx] = values.get(2).cloned().unwrap()
                                             }
                                         }
-                                    },
+                                    }
                                     _ => utils::error(span, "index should be an int"),
                                 };
                                 Value::Null
@@ -220,13 +220,10 @@ fn insert_method() -> Method {
                                             if idx > vec.len() {
                                                 utils::error(span, "index out of bounds")
                                             } else {
-                                                vec.insert(
-                                                    idx,
-                                                    values.get(2).cloned().unwrap(),
-                                                )
+                                                vec.insert(idx, values.get(2).cloned().unwrap())
                                             }
                                         }
-                                    },
+                                    }
                                     _ => utils::error(span, "index should be an int"),
                                 };
                                 Value::Null
@@ -275,7 +272,7 @@ fn remove_method() -> Method {
                                                 vec.remove(idx);
                                             }
                                         }
-                                    },
+                                    }
                                     _ => utils::error(span, "index should be an int"),
                                 };
                                 Value::Null

@@ -1,30 +1,30 @@
 /// Imports
 use camino::Utf8PathBuf;
-use tick_common::{
-    bail,
-    io::{IO, IOError},
-};
 use std::{
     fs,
     io::{self, Write},
+};
+use tick_common::{
+    bail,
+    io::{IO, IOError},
 };
 
 /// Cli IO implementation
 pub struct CliIO;
 impl IO for CliIO {
-    // Input implementation
+    /// Input implementation
     fn input(&self) -> String {
         let mut line = String::new();
         let _ = io::stdin().read_line(&mut line);
         line
     }
 
-    // Output implementation
+    /// Output implementation
     fn output(&self, text: &str) {
         print!("{text}");
     }
 
-    // Read implementation
+    /// Read implementation
     fn read(&self, path: &Utf8PathBuf) -> String {
         // Reading module
         match fs::read_to_string(&path) {
@@ -33,7 +33,7 @@ impl IO for CliIO {
         }
     }
 
-    // Resolve implementation
+    /// Resolve implementation
     fn resolve(&self, path: &str) -> Option<Utf8PathBuf> {
         // Retrieving current directory
         match std::env::current_dir() {
@@ -56,7 +56,7 @@ impl IO for CliIO {
         }
     }
 
-    // Flushes stream
+    /// Flushes stream
     fn flush(&self) {
         let _ = io::stdout().flush();
     }

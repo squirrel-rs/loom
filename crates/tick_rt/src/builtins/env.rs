@@ -1,4 +1,5 @@
 /// Imports
+use crate::refs::MutRef;
 use crate::{
     builtins::utils::error,
     refs::{EnvRef, Ref},
@@ -8,6 +9,7 @@ use crate::{
     },
 };
 use std::{cell::RefCell, rc::Rc};
+use tick_common::bug;
 
 /// Set var definition
 pub fn set_var() -> Ref<Native> {
@@ -77,13 +79,51 @@ pub fn cwd() -> Ref<Native> {
     })
 }
 
-/// Home directory definitionn
+/// Home directory definition
 pub fn home() -> Ref<Native> {
     Ref::new(Native {
         arity: 0,
         function: Box::new(|_, span, _| match std::env::home_dir() {
             Some(path) => Value::String(path.to_string_lossy().into_owned()),
             None => error(span, "could not determine home directory"),
+        }),
+    })
+}
+
+/// Command line arguments
+pub fn args() -> Ref<Native> {
+    Ref::new(Native {
+        arity: 0,
+        function: Box::new(|rt, span, _| {
+            // Retrieving list type
+            let list_builtin = rt
+                .builtins
+                .env
+                .borrow()
+                .lookup("List")
+                .unwrap_or_else(|| error(span, "list builtin is not found"));
+            match list_builtin {
+                Value::Type(list_ty) => match rt.call_type(span, Vec::new(), list_ty) {
+                    Ok(val) => match val {
+                        Value::Instance(list) => {
+                            list.borrow_mut().fields.insert(
+                                "$internal".to_string(),
+                                Value::Any(MutRef::new(RefCell::new(
+                                    std::env::args()
+                                        .map(|a| Value::String(a))
+                                        .collect::<Vec<Value>>(),
+                                ))),
+                            );
+                            Value::Instance(list)
+                        }
+                        _ => bug!("`call_type` returned non-instance value"),
+                    },
+                    Err(_) => {
+                        bug!("control flow leak");
+                    }
+                },
+                _ => error(span, "list builtin is not a type"),
+            }
         }),
     })
 }
@@ -98,6 +138,7 @@ pub fn provide_env() -> EnvRef {
     env.force_define("var", Value::Callable(Callable::Native(var())));
     env.force_define("cwd", Value::Callable(Callable::Native(cwd())));
     env.force_define("home", Value::Callable(Callable::Native(home())));
+    env.force_define("args", Value::Callable(Callable::Native(args())));
     env.force_define("arch", Value::String(std::env::consts::ARCH.to_string()));
     env.force_define("os", Value::String(std::env::consts::OS.to_string()));
     env.force_define(

@@ -1,8 +1,8 @@
 /// Imports
 use crate::{error::RuntimeError, refs::EnvRef, rt::value::Value};
+use std::collections::HashMap;
 use tick_common::bail;
 use tick_lex::token::Span;
-use std::collections::HashMap;
 
 /// Variables environment
 #[derive(Default, Debug)]

@@ -1,7 +1,7 @@
 /// Imports
 use crate::stmt::Block;
-use tick_lex::token::Span;
 use std::fmt::Display;
+use tick_lex::token::Span;
 
 /// Assignment operator
 #[derive(Debug, Clone, Copy)]

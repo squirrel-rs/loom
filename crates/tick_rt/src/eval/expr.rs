@@ -314,7 +314,7 @@ impl<'io> Interpreter<'io> {
     }
 
     /// Calls closure
-    fn call_closure(
+    pub(crate) fn call_closure(
         &mut self,
         span: &Span,
         args: Vec<Value>,
@@ -354,7 +354,12 @@ impl<'io> Interpreter<'io> {
     }
 
     /// Calls native function
-    fn call_native(&mut self, span: &Span, args: Vec<Value>, native: Ref<Native>) -> Flow<Value> {
+    pub(crate) fn call_native(
+        &mut self,
+        span: &Span,
+        args: Vec<Value>,
+        native: Ref<Native>,
+    ) -> Flow<Value> {
         // Checking arity
         self.check_arity(span, native.arity, args.len());
 
@@ -371,7 +376,12 @@ impl<'io> Interpreter<'io> {
     }
 
     /// Calls type and creates instance
-    fn call_type(&mut self, span: &Span, args: Vec<Value>, ty: Ref<Type>) -> Flow<Value> {
+    pub(crate) fn call_type(
+        &mut self,
+        span: &Span,
+        args: Vec<Value>,
+        ty: Ref<Type>,
+    ) -> Flow<Value> {
         // Creating instance
         let instance = self.create_instance(ty);
 

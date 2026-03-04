@@ -1,8 +1,8 @@
-/// Imports
-use tick_lex::token::TokenKind;
 use miette::{Diagnostic, NamedSource, SourceSpan};
 use std::sync::Arc;
 use thiserror::Error;
+/// Imports
+use tick_lex::token::TokenKind;
 
 /// Parser error
 #[derive(Error, Diagnostic, Debug)]
