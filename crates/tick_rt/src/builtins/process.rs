@@ -10,7 +10,7 @@ use crate::{
 use std::{
     cell::RefCell,
     collections::HashMap,
-    io::Read,
+    io::{Read, Write},
     process::{Child, Command},
     rc::Rc,
     thread,
@@ -239,6 +239,98 @@ fn process_output_method() -> Method {
     }))
 }
 
+/// `Process` stderr method
+fn process_stderr_method() -> Method {
+    Method::Native(Ref::new(Native {
+        arity: 1,
+        function: Box::new(|_, span, values| {
+            let list = values.get(0).cloned().unwrap();
+            match list {
+                Value::Instance(instance) => {
+                    // Safety: borrow is temporal for this line
+                    let internal = instance
+                        .borrow_mut()
+                        .fields
+                        .get("$internal")
+                        .cloned()
+                        .unwrap();
+
+                    match internal {
+                        // Safety: borrow is temporal
+                        Value::Any(list) => match list.borrow_mut().downcast_mut::<Child>() {
+                            Some(child) => {
+                                let output = match &mut child.stderr {
+                                    Some(stderr) => {
+                                        let mut output = String::new();
+                                        let _ = stderr.read_to_string(&mut output);
+                                        output
+                                    }
+                                    None => "<failed to retrieve stderr>".to_string(),
+                                };
+                                Value::String(output)
+                            }
+                            _ => utils::error(span, "corrupted process"),
+                        },
+                        _ => {
+                            utils::error(span, "corrupted process");
+                        }
+                    }
+                }
+                _ => unreachable!(),
+            }
+        }),
+    }))
+}
+
+/// `Process` write method
+fn process_write_method() -> Method {
+    Method::Native(Ref::new(Native {
+        arity: 1,
+        function: Box::new(|_, span, values| {
+            let list = values.get(0).cloned().unwrap();
+            match list {
+                Value::Instance(instance) => {
+                    // Safety: borrow is temporal for this line
+                    let internal = instance
+                        .borrow_mut()
+                        .fields
+                        .get("$internal")
+                        .cloned()
+                        .unwrap();
+
+                    match internal {
+                        // Safety: borrow is temporal
+                        Value::Any(list) => match list.borrow_mut().downcast_mut::<Child>() {
+                            Some(child) => {
+                                match &mut child.stdin {
+                                    Some(stdin) => {
+                                        match stdin.write_all(
+                                            format!("{}", values.get(1).cloned().unwrap())
+                                                .as_bytes(),
+                                        ) {
+                                            Ok(_) => {}
+                                            Err(err) => utils::error(
+                                                span,
+                                                &format!("failed to write into stdin: {err:?}"),
+                                            ),
+                                        }
+                                    }
+                                    None => utils::error(span, "failed to retrieve stderr"),
+                                };
+                                Value::Null
+                            }
+                            _ => utils::error(span, "corrupted process"),
+                        },
+                        _ => {
+                            utils::error(span, "corrupted process");
+                        }
+                    }
+                }
+                _ => unreachable!(),
+            }
+        }),
+    }))
+}
 /// Provides `Process` type
 fn provide_process_type() -> Ref<Type> {
     Ref::new(Type {
@@ -252,6 +344,10 @@ fn provide_process_type() -> Ref<Type> {
             ("kill".to_string(), process_kill_method()),
             // Output method
             ("output".to_string(), process_output_method()),
+            // Stderr method
+            ("stderr".to_string(), process_stderr_method()),
+            // Write method
+            ("write".to_string(), process_stderr_method()),
         ]),
     })
 }
