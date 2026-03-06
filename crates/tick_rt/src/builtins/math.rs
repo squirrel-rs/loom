@@ -1,6 +1,6 @@
 /// Imports
 use crate::{
-    error::RuntimeError,
+    builtins::utils,
     refs::{EnvRef, Ref},
     rt::{
         env::Environment,
@@ -16,7 +16,6 @@ use std::{
     },
     rc::Rc,
 };
-use tick_common::bail;
 
 /// Math sin
 fn sin() -> Ref<Native> {
@@ -25,11 +24,7 @@ fn sin() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::sin(*int as f64)),
             Value::Float(float) => Value::Float(f64::sin(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -41,11 +36,7 @@ fn sinh() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::sinh(*int as f64)),
             Value::Float(float) => Value::Float(f64::sinh(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -57,11 +48,7 @@ fn cos() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::cos(*int as f64)),
             Value::Float(float) => Value::Float(f64::cos(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -73,11 +60,7 @@ fn cosh() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::cosh(*int as f64)),
             Value::Float(float) => Value::Float(f64::cosh(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -89,11 +72,7 @@ fn asin() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::asin(*int as f64)),
             Value::Float(float) => Value::Float(f64::asin(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -105,11 +84,7 @@ fn asinh() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::asinh(*int as f64)),
             Value::Float(float) => Value::Float(f64::asinh(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -121,11 +96,7 @@ fn acos() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::acos(*int as f64)),
             Value::Float(float) => Value::Float(f64::acos(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -137,11 +108,7 @@ fn acosh() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::acosh(*int as f64)),
             Value::Float(float) => Value::Float(f64::acosh(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -153,11 +120,7 @@ fn atg() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::atan(*int as f64)),
             Value::Float(float) => Value::Float(f64::atan(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -172,11 +135,7 @@ fn atg2() -> Ref<Native> {
                 (Value::Int(x), Value::Float(y)) => Value::Float(f64::atan2(*y, *x as f64)),
                 (Value::Float(x), Value::Int(y)) => Value::Float(f64::atan2(*y as f64, *x)),
                 (Value::Float(x), Value::Float(y)) => Value::Float(f64::atan2(*y, *x)),
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             }
         }),
     });
@@ -189,11 +148,7 @@ fn tg() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::tan(*int as f64)),
             Value::Float(float) => Value::Float(f64::tan(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -205,11 +160,7 @@ fn tgh() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::tanh(*int as f64)),
             Value::Float(float) => Value::Float(f64::tanh(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -221,11 +172,7 @@ fn ctg() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(1.0 / f64::tan(*int as f64)),
             Value::Float(float) => Value::Float(1.0 / f64::tan(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -237,11 +184,7 @@ fn ctgh() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(1.0 / f64::tanh(*int as f64)),
             Value::Float(float) => Value::Float(1.0 / f64::tanh(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -253,11 +196,7 @@ fn sqrt() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::sqrt(*int as f64)),
             Value::Float(float) => Value::Float(f64::sqrt(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -269,11 +208,7 @@ fn cbrt() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::cbrt(*int as f64)),
             Value::Float(float) => Value::Float(f64::cbrt(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -286,20 +221,12 @@ fn log() -> Ref<Native> {
             let a = match values.get(0).unwrap() {
                 Value::Int(i) => *i as f64,
                 Value::Float(f) => *f,
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             };
             let b = match values.get(1).unwrap() {
                 Value::Int(i) => *i as f64,
                 Value::Float(f) => *f,
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             };
             Value::Float(a.log(b))
         }),
@@ -315,27 +242,15 @@ fn min() -> Ref<Native> {
             Value::Int(a) => match values.get(1).unwrap() {
                 Value::Int(b) => Value::Int(*a.min(b)),
                 Value::Float(b) => Value::Float((*a as f64).min(*b)),
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             },
             // Float min
             Value::Float(a) => match values.get(1).unwrap() {
                 Value::Int(b) => Value::Float(a.min(*b as f64)),
                 Value::Float(b) => Value::Float(a.min(*b)),
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             },
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -349,27 +264,15 @@ fn max() -> Ref<Native> {
             Value::Int(a) => match values.get(1).unwrap() {
                 Value::Int(b) => Value::Int(*a.max(b)),
                 Value::Float(b) => Value::Float((*a as f64).max(*b)),
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             },
             // Float max
             Value::Float(a) => match values.get(1).unwrap() {
                 Value::Int(b) => Value::Float(a.max(*b as f64)),
                 Value::Float(b) => Value::Float(a.max(*b)),
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             },
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -383,85 +286,49 @@ fn clamp() -> Ref<Native> {
             Value::Int(x) => match (values.get(1).unwrap(), values.get(2).unwrap()) {
                 (Value::Int(a), Value::Int(b)) => {
                     if a > b {
-                        bail!(RuntimeError::Bail {
-                            text: "clamp: min must be <= max".to_string(),
-                            src: span.0.clone(),
-                            span: span.1.clone().into()
-                        })
+                        utils::error(span, "clamp: min must be <= max")
                     }
                     Value::Int(*x.clamp(a, b))
                 }
                 (Value::Int(a), Value::Float(b)) | (Value::Float(b), Value::Int(a)) => {
                     let (min, max) = (*a as f64, *b);
                     if min > max {
-                        bail!(RuntimeError::Bail {
-                            text: "clamp: min must be <= max".to_string(),
-                            src: span.0.clone(),
-                            span: span.1.clone().into()
-                        })
+                        utils::error(span, "clamp: min must be <= max")
                     }
                     Value::Float((*x as f64).clamp(min, max))
                 }
                 (Value::Float(a), Value::Float(b)) => {
                     if a > b {
-                        bail!(RuntimeError::Bail {
-                            text: "clamp: min must be <= max".to_string(),
-                            src: span.0.clone(),
-                            span: span.1.clone().into()
-                        })
+                        utils::error(span, "clamp: min must be <= max")
                     }
                     Value::Float((*x as f64).clamp(*a, *b))
                 }
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             },
             // Float clamp
             Value::Float(x) => match (values.get(1).unwrap(), values.get(2).unwrap()) {
                 (Value::Int(a), Value::Int(b)) => {
                     if a > b {
-                        bail!(RuntimeError::Bail {
-                            text: "clamp: min must be <= max".to_string(),
-                            src: span.0.clone(),
-                            span: span.1.clone().into()
-                        })
+                        utils::error(span, "clamp: min must be <= max")
                     }
                     Value::Float(x.clamp(*a as f64, *b as f64))
                 }
                 (Value::Int(a), Value::Float(b)) | (Value::Float(b), Value::Int(a)) => {
                     let (min, max) = (*a as f64, *b);
                     if min > max {
-                        bail!(RuntimeError::Bail {
-                            text: "clamp: min must be <= max".to_string(),
-                            src: span.0.clone(),
-                            span: span.1.clone().into()
-                        })
+                        utils::error(span, "clamp: min must be <= max")
                     }
                     Value::Float(x.clamp(min, max))
                 }
                 (Value::Float(a), Value::Float(b)) => {
                     if a > b {
-                        bail!(RuntimeError::Bail {
-                            text: "clamp: min must be <= max".to_string(),
-                            src: span.0.clone(),
-                            span: span.1.clone().into()
-                        })
+                        utils::error(span, "clamp: min must be <= max")
                     }
                     Value::Float(x.clamp(*a, *b))
                 }
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             },
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -473,11 +340,7 @@ fn log2() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::log2(*int as f64)),
             Value::Float(float) => Value::Float(f64::log2(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -489,11 +352,7 @@ fn log10() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::log10(*int as f64)),
             Value::Float(float) => Value::Float(f64::log10(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -505,11 +364,7 @@ fn exp() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => Value::Float(f64::exp(*int as f64)),
             Value::Float(float) => Value::Float(f64::exp(*float)),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -521,18 +376,10 @@ fn abs() -> Ref<Native> {
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Int(int) => match int.checked_abs() {
                 Some(result) => Value::Int(result),
-                None => bail!(RuntimeError::Bail {
-                    text: "int overflow in abs".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                None => utils::error(span, "int overflow in abs"),
             },
             Value::Float(float) => Value::Float(float.abs()),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -543,11 +390,7 @@ fn floor() -> Ref<Native> {
         arity: 1,
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Float(float) => Value::Float(float.floor()),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a float".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a float"),
         }),
     });
 }
@@ -558,11 +401,7 @@ fn ceil() -> Ref<Native> {
         arity: 1,
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Float(float) => Value::Float(float.ceil()),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a float".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a float"),
         }),
     });
 }
@@ -573,11 +412,7 @@ fn trunc() -> Ref<Native> {
         arity: 1,
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Float(float) => Value::Float(float.trunc()),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a float".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a float"),
         }),
     });
 }
@@ -588,11 +423,7 @@ fn round() -> Ref<Native> {
         arity: 1,
         function: Box::new(|_, span, values| match values.get(0).unwrap() {
             Value::Float(float) => Value::Float(float.round()),
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a float".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a float"),
         }),
     });
 }
@@ -612,31 +443,19 @@ fn pow() -> Ref<Native> {
                     if *b >= 0 {
                         // Safe cast
                         let b_u32: u32 = (*b).try_into().unwrap_or_else(|_| {
-                            bail!(RuntimeError::Bail {
-                                text: format!("exponent {} is too large", b),
-                                src: span.0.clone(),
-                                span: span.1.clone().into(),
-                            })
+                            utils::error(span, &format!("exponent {} is too large", b))
                         });
 
                         match a.checked_pow(b_u32) {
                             Some(result) => Value::Int(result),
-                            None => bail!(RuntimeError::Bail {
-                                text: "int overflow in exp".to_string(),
-                                src: span.0.clone(),
-                                span: span.1.clone().into()
-                            }),
+                            None => utils::error(span, "int overflow in exp"),
                         }
                     }
                     // Negative exponent
                     else {
                         // Safe cast
                         let b_i32: i32 = (*b).try_into().unwrap_or_else(|_| {
-                            bail!(RuntimeError::Bail {
-                                text: format!("exponent {} is too small", b),
-                                src: span.0.clone(),
-                                span: span.1.clone().into(),
-                            })
+                            utils::error(span, &format!("exponent {} is too small", b))
                         });
 
                         Value::Float((*a as f64).powi(b_i32))
@@ -645,11 +464,7 @@ fn pow() -> Ref<Native> {
                 // Float exp
                 Value::Float(b) => Value::Float((*a as f64).powf(*b)),
                 // Otherwise, raising error
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             },
             // Float pow
             Value::Float(a) => match values.get(1).unwrap() {
@@ -658,17 +473,9 @@ fn pow() -> Ref<Native> {
                 // Float exp
                 Value::Float(b) => Value::Float(a.powf(*b)),
                 // Otherwise, raising error
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             },
-            _ => bail!(RuntimeError::Bail {
-                text: "argument is expected to be a number".to_string(),
-                src: span.0.clone(),
-                span: span.1.clone().into()
-            }),
+            _ => utils::error(span, "argument is expected to be a number"),
         }),
     });
 }
@@ -683,11 +490,7 @@ fn hypot() -> Ref<Native> {
                 (Value::Int(x), Value::Float(y)) => Value::Float(f64::hypot(*x as f64, *y)),
                 (Value::Float(x), Value::Int(y)) => Value::Float(f64::hypot(*x, *y as f64)),
                 (Value::Float(x), Value::Float(y)) => Value::Float(f64::hypot(*x, *y)),
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             }
         }),
     });
@@ -709,11 +512,7 @@ fn rnd() -> Ref<Native> {
                 (Value::Float(x), Value::Float(y)) => {
                     Value::Float(rand::rng().random_range(*x..*y))
                 }
-                _ => bail!(RuntimeError::Bail {
-                    text: "argument is expected to be a number".to_string(),
-                    src: span.0.clone(),
-                    span: span.1.clone().into()
-                }),
+                _ => utils::error(span, "argument is expected to be a number"),
             }
         }),
     });
