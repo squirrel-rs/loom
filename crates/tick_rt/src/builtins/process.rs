@@ -81,6 +81,7 @@ fn spawn() -> Ref<Native> {
 
             // Searching `Process` type
             let process_ty = match rt.builtins.modules.get("process") {
+                // Safety: borrow is temporal for the end of function
                 Some(module) => match module.borrow().env.borrow().lookup("Process") {
                     Some(ty) => match ty {
                         Value::Type(ty) => ty,
@@ -113,10 +114,10 @@ fn process_init_method() -> Method {
             match list {
                 Value::Instance(instance) => {
                     // Setting `$internal` field
-                    instance.borrow_mut().fields.insert(
-                        "$internal".to_string(),
-                        values.get(1).cloned().unwrap(),
-                    );
+                    instance
+                        .borrow_mut()
+                        .fields
+                        .insert("$internal".to_string(), values.get(1).cloned().unwrap());
 
                     Value::Null
                 }
@@ -143,6 +144,7 @@ fn process_pid_method() -> Method {
                         .unwrap();
 
                     match internal {
+                        // Safety: borrow is temporal and short
                         Value::Any(list) => match list.borrow_mut().downcast_mut::<Child>() {
                             Some(child) => Value::Int(child.id() as i64),
                             _ => utils::error(span, "corrupted process"),
@@ -175,15 +177,14 @@ fn process_kill_method() -> Method {
                         .unwrap();
 
                     match internal {
-                        Value::Any(process) => {
-                            match process.borrow_mut().downcast_mut::<Child>() {
-                                Some(child) => {
-                                    _ = child.kill();
-                                    Value::Null
-                                }
-                                _ => utils::error(span, "corrupted process"),
+                        // Safety: borrow is temporal and short
+                        Value::Any(process) => match process.borrow_mut().downcast_mut::<Child>() {
+                            Some(child) => {
+                                _ = child.kill();
+                                Value::Null
                             }
-                        }
+                            _ => utils::error(span, "corrupted process"),
+                        },
                         _ => {
                             utils::error(span, "corrupted process");
                         }
@@ -212,6 +213,7 @@ fn process_output_method() -> Method {
                         .unwrap();
 
                     match internal {
+                        // Safety: borrow is temporal
                         Value::Any(list) => match list.borrow_mut().downcast_mut::<Child>() {
                             Some(child) => {
                                 let output = match &mut child.stdout {
