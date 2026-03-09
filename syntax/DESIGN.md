@@ -4,19 +4,18 @@ This document describes syntax of the `tick` programming language.
 
 ### Data types
 
-| Data type |   Rust representation   |
-|-----------|-------------------------|
-| int       | `i64`                   |
-| decimal   | `f64`                   |
-| bool      | `boo l`                 |
-| string    | `String`                |
-| function  | `Rc<Function>`          |
-| meta type | `Rc<Type>`              |
-| instance  | `Rc<Instance>`          |
-| null      | `()`                    |
-| native    | `Rc<Native>`            |
-| module    | `Rc<Module>`            |
-| any       | `Rc<dyn std::any::Any>` |
+| Data type | Description                                                               |   Rust representation   |
+|-----------|---------------------------------------------------------------------------|-------------------------|
+| int       | integer number                                                            | `i64`                   |
+| decimal   | floating-point number                                                     | `f64`                   |
+| bool      | logical (bool) type: `true` or `false`                                    | `bool`                  |
+| string    | text data                                                                 | `String`                |
+| callable  | represents reference to  any callable: function, native, bound, etc.      | `Rc<Function>`          |
+| meta type | represents reference to the type.                                         | `Rc<Type>`              |
+| instance  | represents reference to instance of the type.                             | `Rc<RefCell<Instance>>` |
+| null      | represents null value or `nothing`.                                       | `()`                    |
+| module    | represents reference to the module.                                       | `Rc<Module>`            |
+| any       | represents internal rusts `std::Any` variable                             | `Rc<dyn std::any::Any>` |
 
 ### Variable declaration
 `tick` does not support variables shadowing, so here's
