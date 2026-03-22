@@ -2,7 +2,7 @@
 members = [
     "crates/squirrel",
     "crates/squirrel_ast",
-    "crates/squirrel_common",
+    "crates/squirrel_common", "crates/squirrel_jit",
     "crates/squirrel_lex",
     "crates/squirrel_parse",
     "crates/squirrel_rt",

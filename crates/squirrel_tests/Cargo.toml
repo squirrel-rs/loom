@@ -12,5 +12,6 @@ squirrel_parse = { path = "../squirrel_parse" }
 squirrel_sema = { path = "../squirrel_sema" }
 squirrel_ast = { path = "../squirrel_ast" }
 squirrel_rt = { path = "../squirrel_rt" }
+squirrel_jit = { path = "../squirrel_jit" }
 miette = { version = "7.6.0", features = ["fancy"] }
 regex = "1.12.3"

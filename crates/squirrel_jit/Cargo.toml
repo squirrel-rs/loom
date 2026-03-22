@@ -1,0 +1,14 @@
+[package]
+name = "squirrel_jit"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+squirrel_common = { path = "../squirrel_common" }
+squirrel_lex = { path = "../squirrel_lex" }
+squirrel_ast = { path = "../squirrel_ast" }
+cranelift = "0.125.3"
+cranelift-module = "0.125.3"
+cranelift-jit = "0.125.3"
+cranelift-native = "0.125.3"
+cranelift-codegen = "0.125.3"
