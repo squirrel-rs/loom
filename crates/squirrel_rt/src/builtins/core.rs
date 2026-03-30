@@ -1,6 +1,8 @@
+use squirrel_common::bug;
+
 /// Imports
 use crate::{
-    builtins::list,
+    builtins::{list, utils},
     refs::{EnvRef, Ref},
     rt::{
         env::Environment,
@@ -51,6 +53,66 @@ pub fn str_of() -> Ref<Native> {
     })
 }
 
+/// Length of string or list
+pub fn len_of() -> Ref<Native> {
+    Ref::new(Native {
+        arity: 1,
+        function: Box::new(|rt, span, values| {
+            // Matching value to find out way how to get length
+            match values.first().cloned().unwrap() {
+                // If string, retrieving it's len
+                Value::String(str) => Value::Int(str.len() as i64),
+                // If instance, checking of which type this instance is
+                Value::Instance(instance) => {
+                    // Retrieving list type
+                    let list_type = {
+                        let list_value = rt
+                            .builtins
+                            .env
+                            .borrow()
+                            .lookup("List")
+                            .unwrap_or_else(|| bug!("no builtin `List` found"));
+
+                        match list_value {
+                            Value::Type(t) => t,
+                            _ => bug!("builtin `List` is not a type"),
+                        }
+                    };
+
+                    // Checking instance is list
+                    if Rc::ptr_eq(&instance.borrow_mut().type_of, &list_type) {
+                        // If instance is list, retrieving len of it's internal vector
+                        // Safety: borrow is temporal for this line
+                        let internal = instance
+                            .borrow_mut()
+                            .fields
+                            .get("$internal")
+                            .cloned()
+                            .unwrap();
+
+                        match internal {
+                            Value::Any(list) => {
+                                match list.borrow_mut().downcast_mut::<Vec<Value>>() {
+                                    Some(vec) => Value::Int(vec.len() as i64),
+                                    _ => utils::error(span, "couldn't get len of corrupted list"),
+                                }
+                            }
+                            _ => utils::error(span, "couldn't get len of corrupted list"),
+                        }
+                    } else {
+                        utils::error(
+                            span,
+                            &format!("couldn't get len of `{:?}`", Value::Instance(instance)),
+                        )
+                    }
+                }
+                // Anything else => error
+                other => utils::error(span, &format!("couldn't get len of `{:?}`", other)),
+            }
+        }),
+    })
+}
+
 /// Provides env
 pub fn provide_env() -> EnvRef {
     let mut env = Environment::default();
@@ -59,6 +121,7 @@ pub fn provide_env() -> EnvRef {
     env.force_define("println", Value::Callable(Callable::Native(println())));
     env.force_define("readln", Value::Callable(Callable::Native(readln())));
     env.force_define("str_of", Value::Callable(Callable::Native(str_of())));
+    env.force_define("len_of", Value::Callable(Callable::Native(len_of())));
     env.force_define("List", Value::Type(list::provide_type()));
 
     Rc::new(RefCell::new(env))

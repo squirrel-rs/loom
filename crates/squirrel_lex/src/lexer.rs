@@ -4,8 +4,8 @@ use crate::{
     token::{Span, Token, TokenKind},
 };
 use miette::NamedSource;
-use std::{str::Chars, sync::Arc};
 use squirrel_common::bail;
+use std::{str::Chars, sync::Arc};
 
 /// Represents lexer
 pub struct Lexer<'s> {
