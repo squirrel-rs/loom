@@ -35,6 +35,7 @@ Nightly builds are available and can be run on **stable Rust**, giving you a cha
 - [x] `process` library
 - [x] implement anonymous functions
 - [x] extend for loop to iterate over items of list
+- [x] implement dictionaries
 - [ ] write specification for standard library
 - [ ] start writing documentation
 - [ ] basic jit
