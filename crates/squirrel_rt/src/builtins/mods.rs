@@ -1,6 +1,6 @@
 /// Imports
 use crate::{
-    builtins::{crypto, env, fs, is, math, mem, process},
+    builtins::{convert, crypto, env, fs, is, math, mem, process},
     refs::MutRef,
     rt::value::Module,
 };
@@ -49,6 +49,12 @@ pub fn provide_modules() -> HashMap<String, MutRef<Module>> {
             "fs".to_string(),
             MutRef::new(RefCell::new(Module {
                 env: fs::provide_env(),
+            })),
+        ),
+        (
+            "convert".to_string(),
+            MutRef::new(RefCell::new(Module {
+                env: convert::provide_env(),
             })),
         ),
     ])

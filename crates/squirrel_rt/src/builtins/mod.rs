@@ -1,4 +1,5 @@
 /// Modules
+mod convert;
 mod core;
 mod crypto;
 mod dict;
