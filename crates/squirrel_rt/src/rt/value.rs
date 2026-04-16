@@ -3,14 +3,15 @@ use crate::{
     interpreter::Interpreter,
     refs::{EnvRef, MutRef, Ref},
 };
+use squirrel_ast::stmt::Block;
+use squirrel_lex::token::Span;
 use std::{
     any::Any,
     collections::HashMap,
     fmt::{Debug, Display},
+    hash::{Hash, Hasher},
     rc::Rc,
 };
-use squirrel_ast::stmt::Block;
-use squirrel_lex::token::Span;
 
 /// Native function value
 #[derive(Clone, Debug)]
@@ -58,20 +59,20 @@ pub enum Method {
     Closure(Ref<Closure>),
 }
 
-/// User data type
+/// User class type
 #[derive(Clone, Debug)]
-pub struct Type {
-    /// Data type name
+pub struct Class {
+    /// Class type name
     pub name: String,
-    /// Data type methods
+    /// Class type methods
     pub methods: HashMap<String, Method>,
 }
 
-/// User data type instance
+/// User class type instance
 #[derive(Clone, Debug)]
 pub struct Instance {
     /// Type of
-    pub type_of: Ref<Type>,
+    pub type_of: Ref<Class>,
     /// Instance fields
     pub fields: HashMap<String, Value>,
 }
@@ -147,14 +148,14 @@ pub enum Value {
     /// Function value
     Callable(Callable),
     /// Meta type
-    Type(Ref<Type>),
+    Class(Ref<Class>),
     /// Enum type
     Enum(Ref<Enum>),
     /// Trait
     Trait(Ref<Trait>),
     /// Module
     Module(MutRef<Module>),
-    /// Type instance
+    /// Class instance
     Instance(MutRef<Instance>),
     /// Rust's any type
     Any(MutRef<dyn Any>),
@@ -172,7 +173,7 @@ impl Display for Value {
             Value::Float(float) => write!(f, "{float}"),
             Value::String(string) => write!(f, "{string}"),
             Value::Callable(_) => write!(f, "Callable"),
-            Value::Type(typ) => write!(f, "Type({})", typ.name),
+            Value::Class(typ) => write!(f, "Class({})", typ.name),
             Value::Enum(typ) => write!(f, "Enum({})", typ.name),
             Value::Trait(trt) => write!(f, "Trait({})", trt.name),
             Value::Module(_) => write!(f, "Module"),
@@ -190,6 +191,64 @@ impl Debug for Value {
     }
 }
 
+/// Hash implementation
+impl Hash for Value {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        // Hashing descriminant
+        std::mem::discriminant(self).hash(state);
+
+        // Hashing self
+        match self {
+            // Primitives hash
+            Value::Bool(v) => v.hash(state),
+            Value::Int(v) => v.hash(state),
+            Value::Float(v) => {
+                if v.is_nan() {
+                    0.hash(state);
+                } else {
+                    v.to_bits().hash(state);
+                }
+            }
+            Value::String(v) => v.hash(state),
+
+            // Reference-types hash
+            Value::Callable(c) => match c {
+                Callable::Closure(r) => {
+                    (Rc::as_ptr(r) as usize).hash(state);
+                }
+                Callable::Bound(r) => {
+                    (Rc::as_ptr(r) as usize).hash(state);
+                }
+                Callable::Native(r) => {
+                    (Rc::as_ptr(r) as usize).hash(state);
+                }
+            },
+            Value::Class(r) => {
+                (Rc::as_ptr(r) as usize).hash(state);
+            }
+            Value::Enum(r) => {
+                (Rc::as_ptr(r) as usize).hash(state);
+            }
+            Value::Trait(r) => {
+                (Rc::as_ptr(r) as usize).hash(state);
+            }
+            Value::Module(r) => {
+                (Rc::as_ptr(r) as usize).hash(state);
+            }
+            Value::Instance(r) => {
+                (Rc::as_ptr(r) as usize).hash(state);
+            }
+            Value::Any(r) => {
+                (Rc::as_ptr(r) as *const () as usize).hash(state);
+            }
+            Value::Null => {}
+        }
+    }
+}
+
+/// Eq implementation
+impl Eq for Value {}
+
 /// PartialEq implementation
 impl PartialEq for Value {
     fn eq(&self, other: &Self) -> bool {
@@ -199,7 +258,7 @@ impl PartialEq for Value {
             (Self::Float(a), Self::Float(b)) => a == b,
             (Self::String(a), Self::String(b)) => a == b,
             (Self::Callable(a), Self::Callable(b)) => a == b,
-            (Self::Type(a), Self::Type(b)) => Rc::ptr_eq(a, b),
+            (Self::Class(a), Self::Class(b)) => Rc::ptr_eq(a, b),
             (Self::Enum(a), Self::Enum(b)) => Rc::ptr_eq(a, b),
             (Self::Module(a), Self::Module(b)) => Rc::ptr_eq(a, b),
             (Self::Instance(a), Self::Instance(b)) => Rc::ptr_eq(a, b),

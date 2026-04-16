@@ -10,7 +10,7 @@ use squirrel_rt::interpreter::Interpreter;
 
 /// Arguments parser
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
+#[command(version = concat!("🐿️  ", env!("CARGO_PKG_VERSION")), about, long_about = None)]
 struct Args {
     /// Path to the file
     path: Utf8PathBuf,
@@ -43,10 +43,10 @@ fn main() {
     let name = path.file_stem().unwrap_or("<unknown>");
 
     // Preparing IO
-    let mut io = CliIO;
+    let io = CliIO;
 
     // Interpreting
     let code = io.read(&path);
-    let mut interpreter = Interpreter::new(&mut io);
+    let mut interpreter = Interpreter::new(&io);
     let _ = interpreter.interpret_module(name, &code);
 }

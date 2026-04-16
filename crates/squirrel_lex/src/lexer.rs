@@ -4,8 +4,8 @@ use crate::{
     token::{Span, Token, TokenKind},
 };
 use miette::NamedSource;
-use std::{str::Chars, sync::Arc};
 use squirrel_common::bail;
+use std::{str::Chars, sync::Arc};
 
 /// Represents lexer
 pub struct Lexer<'s> {
@@ -287,7 +287,7 @@ impl<'s> Lexer<'s> {
             "in" => TokenKind::In,
             "let" => TokenKind::Let,
             "use" => TokenKind::Use,
-            "type" => TokenKind::Type,
+            "class" => TokenKind::Class,
             "enum" => TokenKind::Enum,
             "if" => TokenKind::If,
             "else" => TokenKind::Else,
@@ -337,11 +337,23 @@ impl<'s> Lexer<'s> {
     /// Skips multiline comment
     fn skip_multiline_comment(&mut self) {
         // #[
+        let start = self.idx;
         self.advance();
         self.advance();
+
+        // Skipping comment
         while !(self.current == Some(']') && self.next == Some('#')) {
-            self.advance();
+            // If eof -> reporting error
+            if self.is_eof() {
+                bail!(LexError::UnterminatedComment {
+                    src: self.source.clone(),
+                    span: (start..self.idx).into()
+                })
+            } else {
+                self.advance();
+            }
         }
+
         // ]#
         self.advance();
         self.advance();
@@ -454,6 +466,7 @@ impl<'s> Iterator for Lexer<'s> {
             (Some(']'), _) => Some(self.advance_with(TokenKind::Rbracket, "]")),
             (Some('('), _) => Some(self.advance_with(TokenKind::Lparen, "(")),
             (Some(')'), _) => Some(self.advance_with(TokenKind::Rparen, ")")),
+            (Some(':'), _) => Some(self.advance_with(TokenKind::Colon, ":")),
             (Some(';'), _) => Some(self.advance_with(TokenKind::Semi, ";")),
             (Some('"'), _) => Some(self.advance_string()),
             (Some(ch), _) => {

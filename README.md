@@ -12,17 +12,18 @@ Nightly builds are available and can be run on **stable Rust**, giving you a cha
 
 #### 🔦 ToDo
 - [ ] `os` library
-- [ ] `fs` library
+- [x] `fs` library
 - [ ] `time` library
 - [x] update `math` library
 - [x] implement `random` in `math` library
 - [x] implement `choice` for list
 - [ ] `strings` library
 - [ ] `fmt` library
-- [ ] `convert` library
+- [x] `convert` library
 - [ ] `reflect` library
 - [x] `env` library (by `Antares64`)
 - [x] `mem` library
+- [ ] `unsafe` library
 - [ ] `signal` library
 - [ ] `zip` library
 - [ ] `color` library
@@ -35,6 +36,7 @@ Nightly builds are available and can be run on **stable Rust**, giving you a cha
 - [x] `process` library
 - [x] implement anonymous functions
 - [x] extend for loop to iterate over items of list
+- [x] implement dictionaries
 - [ ] write specification for standard library
 - [ ] start writing documentation
 - [ ] basic jit

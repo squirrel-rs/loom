@@ -4,9 +4,11 @@ use crate::{
     refs::{EnvRef, MutRef, Ref},
     rt::{
         env::Environment,
-        value::{Callable, Method, Native, Type, Value},
+        value::{Callable, Class, Method, Native, Value},
     },
 };
+use squirrel_common::bug;
+use squirrel_lex::token::Span;
 use std::{
     cell::RefCell,
     collections::HashMap,
@@ -16,7 +18,6 @@ use std::{
     thread,
     time::Duration,
 };
-use squirrel_common::bug;
 
 /// Thread sleep
 fn sleep() -> Ref<Native> {
@@ -100,27 +101,65 @@ fn spawn() -> Ref<Native> {
                 Err(err) => utils::error(span, &format!("failed to span process: {err}")),
             };
 
-            // Searching `Process` type
-            let process_ty = match rt.builtins.modules.get("process") {
+            // Searching `Process` class
+            let process_class = match rt.builtins.modules.get("process") {
                 // Safety: borrow is temporal for the end of function
                 Some(module) => match module.borrow().env.borrow().lookup("Process") {
-                    Some(Value::Type(ty)) => ty,
+                    Some(Value::Class(ty)) => ty,
                     _ => utils::error(span, "corrupted module"),
                 },
                 None => utils::error(span, "corrupted module"),
             };
 
             // Creating `Process` instance
-            match rt.call_type(
+            match rt.call_class(
                 span,
                 vec![Value::Any(MutRef::new(RefCell::new(child)))],
-                process_ty,
+                process_class,
             ) {
                 Ok(val) => val,
                 Err(_) => bug!("control flow leak"),
             }
         }),
     })
+}
+
+/// Helper: validates process
+fn validate_process<F, V>(span: &Span, value: Value, f: F) -> V
+where
+    F: FnOnce(&mut Child) -> V,
+{
+    match value {
+        Value::Instance(instance) => {
+            // Safety: borrow is temporal for this line
+            let internal = instance
+                .borrow_mut()
+                .fields
+                .get("$internal")
+                .cloned()
+                .unwrap();
+
+            match internal {
+                // Safety: borrow is temporal and short
+                Value::Any(process) => match process.borrow_mut().downcast_mut::<Child>() {
+                    Some(child) => f(child),
+                    _ => utils::error(span, "corrupted process"),
+                },
+                _ => {
+                    utils::error(span, "corrupted process");
+                }
+            }
+        }
+        _ => unreachable!(),
+    }
+}
+
+/// Helper: validates process argument
+fn validate_process_arg<F, V>(span: &Span, values: &[Value], f: F) -> V
+where
+    F: FnOnce(&mut Child) -> V,
+{
+    validate_process(span, values.get(0).cloned().unwrap(), f)
 }
 
 /// `Process` init method
@@ -150,30 +189,7 @@ fn process_pid_method() -> Method {
     Method::Native(Ref::new(Native {
         arity: 1,
         function: Box::new(|_, span, values| {
-            let list = values.first().cloned().unwrap();
-            match list {
-                Value::Instance(instance) => {
-                    // Safety: borrow is temporal for this line
-                    let internal = instance
-                        .borrow_mut()
-                        .fields
-                        .get("$internal")
-                        .cloned()
-                        .unwrap();
-
-                    match internal {
-                        // Safety: borrow is temporal and short
-                        Value::Any(list) => match list.borrow_mut().downcast_mut::<Child>() {
-                            Some(child) => Value::Int(child.id() as i64),
-                            _ => utils::error(span, "corrupted process"),
-                        },
-                        _ => {
-                            utils::error(span, "corrupted process");
-                        }
-                    }
-                }
-                _ => unreachable!(),
-            }
+            validate_process_arg(span, &values, |child| Value::Int(child.id() as i64))
         }),
     }))
 }
@@ -183,33 +199,10 @@ fn process_kill_method() -> Method {
     Method::Native(Ref::new(Native {
         arity: 1,
         function: Box::new(|_, span, values| {
-            let process = values.first().cloned().unwrap();
-            match process {
-                Value::Instance(instance) => {
-                    // Safety: borrow is temporal for this line
-                    let internal = instance
-                        .borrow_mut()
-                        .fields
-                        .get("$internal")
-                        .cloned()
-                        .unwrap();
-
-                    match internal {
-                        // Safety: borrow is temporal and short
-                        Value::Any(process) => match process.borrow_mut().downcast_mut::<Child>() {
-                            Some(child) => {
-                                _ = child.kill();
-                                Value::Null
-                            }
-                            _ => utils::error(span, "corrupted process"),
-                        },
-                        _ => {
-                            utils::error(span, "corrupted process");
-                        }
-                    }
-                }
-                _ => unreachable!(),
-            }
+            validate_process_arg(span, &values, |child| {
+                _ = child.kill();
+                Value::Null
+            })
         }),
     }))
 }
@@ -219,40 +212,17 @@ fn process_output_method() -> Method {
     Method::Native(Ref::new(Native {
         arity: 1,
         function: Box::new(|_, span, values| {
-            let list = values.first().cloned().unwrap();
-            match list {
-                Value::Instance(instance) => {
-                    // Safety: borrow is temporal for this line
-                    let internal = instance
-                        .borrow_mut()
-                        .fields
-                        .get("$internal")
-                        .cloned()
-                        .unwrap();
-
-                    match internal {
-                        // Safety: borrow is temporal
-                        Value::Any(list) => match list.borrow_mut().downcast_mut::<Child>() {
-                            Some(child) => {
-                                let output = match &mut child.stdout {
-                                    Some(stdout) => {
-                                        let mut output = String::new();
-                                        let _ = stdout.read_to_string(&mut output);
-                                        output
-                                    }
-                                    None => "<failed to retrieve `stdout`>".to_string(),
-                                };
-                                Value::String(output)
-                            }
-                            _ => utils::error(span, "corrupted process"),
-                        },
-                        _ => {
-                            utils::error(span, "corrupted process");
-                        }
+            validate_process_arg(span, &values, |child| {
+                let output = match &mut child.stdout {
+                    Some(stdout) => {
+                        let mut output = String::new();
+                        let _ = stdout.read_to_string(&mut output);
+                        output
                     }
-                }
-                _ => unreachable!(),
-            }
+                    None => "<failed to retrieve `stdout`>".to_string(),
+                };
+                Value::String(output)
+            })
         }),
     }))
 }
@@ -262,40 +232,17 @@ fn process_stderr_method() -> Method {
     Method::Native(Ref::new(Native {
         arity: 1,
         function: Box::new(|_, span, values| {
-            let list = values.first().cloned().unwrap();
-            match list {
-                Value::Instance(instance) => {
-                    // Safety: borrow is temporal for this line
-                    let internal = instance
-                        .borrow_mut()
-                        .fields
-                        .get("$internal")
-                        .cloned()
-                        .unwrap();
-
-                    match internal {
-                        // Safety: borrow is temporal and short
-                        Value::Any(list) => match list.borrow_mut().downcast_mut::<Child>() {
-                            Some(child) => {
-                                let output = match &mut child.stderr {
-                                    Some(stderr) => {
-                                        let mut output = String::new();
-                                        let _ = stderr.read_to_string(&mut output);
-                                        output
-                                    }
-                                    None => "<failed to retrieve `stderr`>".to_string(),
-                                };
-                                Value::String(output)
-                            }
-                            _ => utils::error(span, "corrupted process"),
-                        },
-                        _ => {
-                            utils::error(span, "corrupted process");
-                        }
+            validate_process_arg(span, &values, |child| {
+                let output = match &mut child.stderr {
+                    Some(stderr) => {
+                        let mut output = String::new();
+                        let _ = stderr.read_to_string(&mut output);
+                        output
                     }
-                }
-                _ => unreachable!(),
-            }
+                    None => "<failed to retrieve `stderr`>".to_string(),
+                };
+                Value::String(output)
+            })
         }),
     }))
 }
@@ -305,53 +252,27 @@ fn process_write_method() -> Method {
     Method::Native(Ref::new(Native {
         arity: 1,
         function: Box::new(|_, span, values| {
-            let list = values.first().cloned().unwrap();
-            match list {
-                Value::Instance(instance) => {
-                    // Safety: borrow is temporal for this line
-                    let internal = instance
-                        .borrow_mut()
-                        .fields
-                        .get("$internal")
-                        .cloned()
-                        .unwrap();
-
-                    match internal {
-                        // Safety: borrow is temporal and short
-                        Value::Any(list) => match list.borrow_mut().downcast_mut::<Child>() {
-                            Some(child) => {
-                                match &mut child.stdin {
-                                    Some(stdin) => {
-                                        match stdin.write_all(
-                                            values.get(1).unwrap().to_string().as_bytes(),
-                                        ) {
-                                            Ok(_) => {}
-                                            Err(err) => utils::error(
-                                                span,
-                                                &format!("failed to write into stdin: {err:?}"),
-                                            ),
-                                        }
-                                    }
-                                    None => utils::error(span, "failed to retrieve `stdin`"),
-                                };
-                                Value::Null
+            validate_process_arg(span, &values, |child| {
+                match &mut child.stdin {
+                    Some(stdin) => {
+                        match stdin.write_all(values.get(1).unwrap().to_string().as_bytes()) {
+                            Ok(_) => {}
+                            Err(err) => {
+                                utils::error(span, &format!("failed to write into stdin: {err:?}"))
                             }
-                            _ => utils::error(span, "corrupted process"),
-                        },
-                        _ => {
-                            utils::error(span, "corrupted process");
                         }
                     }
-                }
-                _ => unreachable!(),
-            }
+                    None => utils::error(span, "failed to retrieve `stdin`"),
+                };
+                Value::Null
+            })
         }),
     }))
 }
 
-/// Provides `Process` type
-fn provide_process_type() -> Ref<Type> {
-    Ref::new(Type {
+/// Provides `Process` class
+fn provide_process_class() -> Ref<Class> {
+    Ref::new(Class {
         name: "Process".to_string(),
         methods: HashMap::from([
             // Init method
@@ -378,7 +299,7 @@ pub fn provide_env() -> EnvRef {
     env.force_define("exit", Value::Callable(Callable::Native(exit())));
     env.force_define("spawn", Value::Callable(Callable::Native(spawn())));
     env.force_define("pid", Value::Int(process::id() as i64));
-    env.force_define("Process", Value::Type(provide_process_type()));
+    env.force_define("Process", Value::Class(provide_process_class()));
 
     Rc::new(RefCell::new(env))
 }

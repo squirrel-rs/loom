@@ -1,14 +1,18 @@
 /// Modules
+mod convert;
 mod core;
+mod crypto;
+mod dict;
 mod env;
+mod fs;
 mod is;
 mod list;
 mod math;
 mod mem;
 mod mods;
 mod process;
+mod time;
 mod utils;
-mod crypto;
 
 /// Imports
 use crate::{

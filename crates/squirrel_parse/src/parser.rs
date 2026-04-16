@@ -1,7 +1,6 @@
 /// Import
 use crate::errors::ParseError;
 use miette::NamedSource;
-use std::sync::Arc;
 use squirrel_ast::{
     atom::{AssignOp, BinOp, Function, Lit, TraitFunction, UnaryOp},
     expr::Expression,
@@ -12,6 +11,7 @@ use squirrel_lex::{
     lexer::Lexer,
     token::{Span, Token, TokenKind},
 };
+use std::sync::Arc;
 
 /// Parser converts a stream of tokens
 /// produced by the lexer into an abstract syntax tree (AST).
@@ -163,12 +163,12 @@ impl<'s> Parser<'s> {
         }
     }
 
-    /// Type declaration parsing
-    fn type_stmt(&mut self) -> Statement {
+    /// Class declaration parsing
+    fn class_stmt(&mut self) -> Statement {
         let start_span = self.peek().span.clone();
 
-        // Parsing type name
-        self.expect(TokenKind::Type);
+        // Parsing class name
+        self.expect(TokenKind::Class);
         let name = self.expect(TokenKind::Id);
         let name_span = start_span.clone() + name.span;
         self.expect(TokenKind::Lbrace);
@@ -182,7 +182,7 @@ impl<'s> Parser<'s> {
 
         let end_span = self.prev().span.clone();
 
-        Statement::Type {
+        Statement::Class {
             span: start_span + end_span,
             name_span,
             name: name.lexeme,
@@ -406,7 +406,7 @@ impl<'s> Parser<'s> {
             TokenKind::While => self.while_stmt(),
             TokenKind::If => self.if_stmt(),
             TokenKind::Let => self.let_stmt(),
-            TokenKind::Type => self.type_stmt(),
+            TokenKind::Class => self.class_stmt(),
             TokenKind::Enum => self.enum_stmt(),
             TokenKind::Trait => self.trait_stmt(),
             TokenKind::Fn => Statement::Function(self.function()),
@@ -587,6 +587,32 @@ impl<'s> Parser<'s> {
         }
     }
 
+    /// Single dict pair parsing
+    fn pair(&mut self) -> (Expression, Expression) {
+        let key = self.expr();
+        self.expect(TokenKind::Colon);
+        let value = self.expr();
+
+        (key, value)
+    }
+
+    /// Dict expression parsing
+    fn dict(&mut self) -> Expression {
+        let start_span = self.peek().span.clone();
+        let dict = self.sep_by(
+            TokenKind::Lbrace,
+            TokenKind::Rbrace,
+            TokenKind::Comma,
+            |p| p.pair(),
+        );
+        let end_span = self.prev().span.clone();
+
+        Expression::Dict {
+            span: start_span + end_span,
+            dict,
+        }
+    }
+
     /// Anonymous function parsing
     fn anon_fn(&mut self) -> Expression {
         let start_span = self.peek().span.clone();
@@ -665,6 +691,7 @@ impl<'s> Parser<'s> {
             }
             TokenKind::Id => self.variable(),
             TokenKind::Lbracket => self.list(),
+            TokenKind::Lbrace => self.dict(),
             TokenKind::Bar | TokenKind::DoubleBar => self.anon_fn(),
             _ => bail!(ParseError::UnexpectedExprToken {
                 got: tk.kind,
