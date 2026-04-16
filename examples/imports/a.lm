@@ -1,0 +1,5 @@
+text := "Hello, "
+
+fun hello(name) {
+    putln(text + name)
+}

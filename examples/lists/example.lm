@@ -1,0 +1,12 @@
+# First variant to create list
+list := List()
+list.push(3)
+list.push("hello")
+putln(list.to_string())
+
+# Second variant to create list
+list2 := [5, 6, "true", false]
+list2.pop()
+list2.remove(1)
+putln(list2.to_string())
+putln("random: " + str_of(list2.choice()))

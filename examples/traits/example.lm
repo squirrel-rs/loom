@@ -1,0 +1,30 @@
+#[ Represents pet trait ]#
+trait Pet {
+    fun feed(self, amount)
+}
+
+#[ Represents a Cat, meow :3 ]#
+class Cat {
+    # Cat has method `feed`
+    fun feed(self, amount) {
+        self.food := amount
+    }
+}
+
+#[ Represents a Toad ]#
+class Toad {
+    # Toad doesn't have method `feed`, but `stroke`
+    fun stroke(self) {
+        putln("Croak! Croak!")
+    }
+}
+
+cat := Cat()
+if cat >: Pet {
+    putln("`Cat` impls `Pet`")
+}
+
+toad := Toad()
+if toad >! Pet {
+    putln("`Toad` doesn't impl `Pet`")
+}

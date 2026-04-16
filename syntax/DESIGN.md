@@ -1,12 +1,12 @@
-## 📐 Syntax examples
+## 🪭 Syntax examples
 
-This document describes syntax of the `Squirrel` programming language.
+This document describes syntax of the `Loom` programming language.
 
-### Data types
+### 🎨 Data types
 | Data type | Description                                                               |   Rust representation            |
 |-----------|---------------------------------------------------------------------------|----------------------------------|
 | int       | integer number                                                            | `i64`                            |
-| decimal   | floating-point number                                                     | `f64`                            |
+| float     | floating-point number                                                     | `f64`                            |
 | bool      | logical (bool) type: `true` or `false`                                    | `bool`                           |
 | string    | text data                                                                 | `String`                         |
 | callable  | represents reference to  any callable: function, native, bound, etc.      | `Rc<Function>`                   |
@@ -18,115 +18,117 @@ This document describes syntax of the `Squirrel` programming language.
 | any       | represents internal rusts `std::Any` variable                             | `Rc<RefCell<dyn std::any::Any>>` |
 
 ### Variable declaration
-`Squirrel` does not support variables shadowing, so here's
+`Loom` does not support variables shadowing, so here's
 a way to define variable and to reassign it.
 
 Variable definition:
-```Squirrel
-let id = value;
+```loom
+id := value
 ```
 
 Variable assignment:
 ```
-id = value;
+id = value
 ```
 
 ### Binary operations
-`Squirrel` supports following binary operations:
+`Loom` supports following binary operations:
 
-```Squirrel
-+ - * / % && & || | ^ > < == !=
+```loom
++ - * / % && & || | ^ > < == != >: >!
 ```
 
 ### Unary operations
-`Squirrel` supports following unary operations:
+`Loom` supports following unary operations:
 
 ```
 - !
 ```
 
 ### Compound operators
-`Squirrel` supports following compound operators:
+`Loom` supports following compound operators:
 
 ```
-id += value;
-id -= value;
-id *= value;
-id /= value;
-id %= value;
-id &= value;
-id |= value;
+id += value
+id -= value
+id *= value
+id /= value
+id %= value
+id &= value
+id |= value
 ```
 
 ### Value examples
 Examples of the values:
 
-| Data type | Example of the value       |
-|-----------|----------------------------|
-| int       | 123                        | 
-| decimal   | 123.456                    |
-| bool      | true / false               |
-| string    | "text"                     |
-| function  | fn(x, y) {} return x + y } |
-| class     | AnyDeclaredClass           |
-| enum      | AnyDeclaredEnum            |
-| instance  | AnyDeclaredClass()         |
-| null      | null                       |
-| native    | declared native            |
-| module    | module                     |
-| any       | any_native_value           |
+| Data type | Example of the value        |
+|-----------|-----------------------------|
+| int       | 123                         | 
+| float     | 123.456                     |
+| bool      | true / false                |
+| string    | "text"                      |
+| function  | fun(x, y) {} return x + y } |
+| class     | AnyDeclaredClass            |
+| enum      | AnyDeclaredEnum             |
+| instance  | AnyDeclaredClass()          |
+| null      | null                        |
+| native    | declared native             |
+| module    | module                      |
+| any       | any_native_value            |
 
 ### Functions example
-Here's an example on how you can define function in `Squirrel`:
+Here's an example on how you can define function in `Loom`:
 
-```Squirrel
-fn fib(x) {
+```loom
+fun fib(x) {
   if x <= 1 {
-    return x;
+    return x
   } else {
-    return fib(x - 1) + fib(x - 2);
+    return fib(x - 1) + fib(x - 2)
   }
 }
 ```
 
-Squirrel supports closures:
+Loom supports closures:
 
-```Squirrel
-fn a() {
-  let x = 1;
-  fn b() {
-    x += 1;
+```loom
+fun a() {
+  x := 1
+  fun b() {
+    x += 1
   }
-  b(); // x = 2
-  return b;
+  b() # x = 2
+  return b
 }
 
-let b = a();
-b(); // x = 3
-b(); // x = 4
-b(); // x = 5
+b := a()
+b() # x = 3
+b() # x = 4
+b() # x = 5
 ```
 
 ### Classes or custom data types
-Squirrel supports custom data types. Here is example:
-```Squirrel
-type Dog {
-  fn init() {
-    self.food = 3;
-    self.water = 3;
+`Loom` supports custom data types. Here is example:
+
+```loom
+class Dog {
+  fun init() {
+    self.food := 3
+    self.water := 3
   }
-  fn get_food() {
-    return self.food;
+  fun get_food() {
+    return self.food
   }
 }
-let dog = Dog();
-let a = dog.get_food();
-let b = dog.food;
+
+dog := Dog()
+a := dog.get_food()
+b := dog.food
 # a == b
 ```
 
 ### Comments
-Squirrel comments examples:
+`Loom` comments examples:
 
 ```
 #[
@@ -142,7 +144,8 @@ brackets
 ```
 
 ### Usings
-Squirrel is modular:
+`Loom` is modular:
+
 ```
 use a # import `a` as `a`
 use a as b # import `a` as `b`
@@ -151,50 +154,53 @@ use a for b, c # import multiple items
 ```
 
 ### Loops
-Squirrel loops examples:
+`Loom` loops examples:
 
 For loop with range examples.
 You can use any expression instead of numbers in range.
 ```
 for i in 0..100 {
-  println(i);
+  putln(i)
 }
 
 for i in 100..0 {
-  println(i);
+  putln(i)
 }
 
 for i in 0..=100 {
-  println(i);
+  putln(i)
 }
 
 for i in 100..=0 {
-  println(i)
+  putln(i)
 }
 ```
 
-While loop examples. You can see, that `Squirrel` supports `continue` and `break` keywords
+While loop examples. You can see, that `Loom` supports `continue` and `break` keywords
 ```
-let i = 0;
+i := 0
 while true {
   if i == 100 {
-    continue;
-    i -= 200;
+    continue
+    i -= 200
   }
-  i += 1;
+  i += 1
   if i == -199 {
-    break;
+    break
   }
 }
 ```
 
 ### Logical statements
 If examples:
-```Squirrel
-let a = scan();
-if int(a) > 5 {
+
+```loom
+use convert
+
+let a = readln()
+if convert.int(a) > 5 {
   ...
-} else if int(a) < 5 {
+} else if convert.int(a) < 5 {
   ...
 } else {
   ...
@@ -203,33 +209,71 @@ if int(a) > 5 {
 
 ### Errors raising
 Bail immediately breaks execution with error:
-```Squirrel
+
+```loom
 bail "some text"
 ```
 
 ### Anonymous function
-Squirrel supports rust-like anonymous functions:
-```Squirrel
-let a = || 1;
-let b = |a| a + 1;
-let c = |a| {
-  return a + 1;
-};
-println(a());
-println(b(1));
-println(c(2));
+`Loom` supports rust-like anonymous functions:
+
+```loom
+a := || 1
+b := |a| a + 1
+c := |a| {
+  return a + 1
+}
+putln(a())
+putln(b(1))
+putln(c(2))
 ```
 
 ### Enumerations
-Squirrel supports enumerations. Every variant is just an int variable inside `Dog`.
-```Squirrel
+`Loom` supports enumerations. Every variant is just an int variable inside `Dog`.
+
+```loom
 enum Dog {
   Poodle,  # 0
   Bulldog, # 1
   Beagle,
   Husky
 }
-let dog = Dog.Poodle;
-println(dog == 0); # true
-println(dog == Dog.Beagle); # false
+
+dog := Dog.Poodle
+putln(dog == 0) # true
+putln(dog == Dog.Beagle) # false
+```
+
+### Traits
+`Loom` supports traits. Trait represents a behaviour description
+that classes can implemenet.
+
+```loom
+trait Pet {
+  fun feed(self, amount)
+}
+
+class Cat {
+  # Cat has method `feed`
+  fun feed(self, amount) {
+      self.food = amount;
+  }
+}
+
+class Toad {
+  # Toad doesn't have method `feed`, but `stroke`
+  fun stroke(self) {
+      println("Croak! Croak!");
+  }
+}
+
+let cat = Cat();
+if cat >: Pet {
+    println("`Cat` impls `Pet`");
+}
+
+let toad = Toad();
+if toad >! Pet {
+    println("`Toad` doesn't impl `Pet`");
+}
 ```

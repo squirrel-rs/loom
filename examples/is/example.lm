@@ -1,0 +1,5 @@
+use is
+
+putln(is.int(13))
+putln(is.float(13))
+putln(is.bool(13))

@@ -1,8 +1,0 @@
-[package]
-name = "squirrel_ast"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-squirrel_common = { path = "../squirrel_common" }
-squirrel_lex = { path = "../squirrel_lex" }

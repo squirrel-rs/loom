@@ -1,0 +1,31 @@
+#[ Progress bar that erases only the last line ]#
+use process for sleep
+
+progress := 0
+while progress <= 100 {
+    bar := ""
+    i := 0
+
+    while i < progress / 2 {
+        bar += "#"
+        i += 1
+    }
+
+    spaces := ""
+    i = 0
+    while i < 50 - len_of(bar) {
+        spaces += " "
+        i += 1
+    }
+
+    if progress > 0 {
+        print("\x{1B}[1A\x{1B}[2K\x{1B}[G")
+    }
+
+    putln("🦄: [" + bar + spaces + "] " + str_of(progress) + "%")
+
+    progress += 5
+    sleep(100)
+}
+
+putln("Done!")

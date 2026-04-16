@@ -1,19 +1,46 @@
-#### 🐿️ Squirrel
-... is very tiny, lightweight, dynamic programming language designed to be simple and readable.
+#### 🧵 Loom
+... is a friendly, lightweight programming language for math and games
 
-#### 💡 Quick Start
-```squirrel
+#### 💡 Status
+`Loom` is unstable, and currently a **work in progress project (WIP)**.  
+Nightly builds are available giving you a chance to explore and test the language as it evolves.
+
+#### 🏠 Quick Start
+```loom
 println("Hello, world!");
 ```
 
-#### ⚙️ Status
-`Squirrel` is currently a **work in progress project (WIP)**.  
-Nightly builds are available and can be run on **stable Rust**, giving you a chance to explore and test the language as it evolves.
+#### ✨ Examples
+```loom
+fun main() {
+  putln("Hello, world!")
+}
+```
+
+```loom
+class Sandwich {
+  fun init(self, cheese, tomatoes) {
+    self.cheese := cheese
+    self.tomatoes := tomatoes
+  }
+
+  fun cook(self) {
+    putln(
+      "Sandwich is ready with "
+      + str_of(self.cheese) + " cheese, "
+      + str_of(self.tomatoes) + " tomatoes."
+    )
+  }
+}
+
+sandwich := Sandwich(3, 2)
+sandwich.cook()
+```
 
 #### 🔦 ToDo
 - [ ] `os` library
 - [x] `fs` library
-- [ ] `time` library
+- [x] `time` library
 - [x] update `math` library
 - [x] implement `random` in `math` library
 - [x] implement `choice` for list

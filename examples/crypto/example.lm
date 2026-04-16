@@ -1,0 +1,9 @@
+use crypto
+
+putln(crypto.b64("Hello, world!"))
+putln(crypto.de_b64(crypto.b64("Hello, world!")))
+putln(crypto.sha224("Hello, world!"))
+putln(crypto.sha256("Hello, world!"))
+putln(crypto.sha384("Hello, world!"))
+putln(crypto.sha512("Hello, world!"))
+putln(crypto.md5("Hello, world!"))

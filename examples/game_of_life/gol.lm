@@ -1,0 +1,135 @@
+# Game of Life implementation
+use math for rnd
+use process for sleep
+
+WIDTH := 100
+HEIGHT := 60
+
+# Create initial random grid
+grid := []
+
+y := 0
+while y < HEIGHT {
+    row := []
+
+    x := 0
+    while x < WIDTH {
+        row.push(rnd(0, 2))  # Random 0 or 1
+        x += 1
+    }
+
+    grid.push(row)
+    y += 1
+}
+
+fun clear() {
+    # ANSI escape sequence to clear screen
+    put("\x{1B}[H\x{1B}[J")
+}
+
+fun draw() {
+    # Render grid to terminal
+    y := 0
+    while y < HEIGHT {
+        row := grid.get(y)
+        x := 0
+
+        while x < WIDTH {
+            if row.get(x) == 1 {
+                put("█")  # Alive cell
+            } else {
+                put(" ")  # Dead cell
+            }
+            x += 1
+        }
+
+        putln("")  # New line after each row
+        y += 1
+    }
+}
+
+fun count_neighbors(y, x) {
+    # Count alive neighbors around cell (y, x)
+    count := 0
+
+    dy := -1
+    while dy <= 1 {
+        dx := -1
+        while dx <= 1 {
+            # Skip the cell itself
+            if !(dy == 0 && dx == 0) {
+                ny := y + dy
+                nx := x + dx
+
+                # Check bounds
+                if ny >= 0 && ny < HEIGHT && nx >= 0 && nx < WIDTH {
+                    row := grid.get(ny)
+                    count += row.get(nx)
+                }
+            }
+
+            dx += 1
+        }
+
+        dy += 1
+    }
+
+    return count
+}
+
+fun step() {
+    # Create new empty grid
+    new_grid := []
+
+    y := 0
+    while y < HEIGHT {
+        new_row := []
+
+        x := 0
+        while x < WIDTH {
+            new_row.push(0) # Initialize as dead
+            x += 1
+        }
+
+        new_grid.push(new_row)
+        y += 1
+    }
+
+    # Apply Game of Life rules
+    y = 0
+    while y < HEIGHT {
+        row := grid.get(y)
+        new_row := new_grid.get(y)
+
+        x := 0
+        while x < WIDTH {
+            neighbors := count_neighbors(y, x)
+            if row.get(x) == 1 {
+                # Alive cell survives with 2 or 3 neighbors
+                if neighbors == 2 || neighbors == 3 {
+                    new_row.set(x, 1)
+                }
+            } else {
+                # Dead cell becomes alive with exactly 3 neighbors
+                if neighbors == 3 {
+                    new_row.set(x, 1)
+                }
+            }
+
+            x += 1
+        }
+
+        y += 1
+    }
+
+    # Replace old grid with new one
+    grid = new_grid
+}
+
+# Main loop
+while true {
+    clear()
+    draw()
+    step()
+    sleep(500)  # Delay in milliseconds
+}

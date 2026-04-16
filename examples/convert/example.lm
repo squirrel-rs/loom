@@ -1,0 +1,7 @@
+use convert
+
+putln(convert.int(3.14))
+putln(convert.float(3))
+putln(convert.bool("true"))
+putln(convert.bool("false"))
+putln(convert.string(123))

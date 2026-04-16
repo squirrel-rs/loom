@@ -1,0 +1,5 @@
+use process
+
+p := process.spawn("ls", ["-a"])
+putln(p.output())
+putln(process.pid())

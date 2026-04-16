@@ -1,0 +1,4 @@
+use a
+
+hi := a.Hello()
+hi.print()

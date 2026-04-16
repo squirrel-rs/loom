@@ -1,0 +1,7 @@
+a := 4
+
+class Hello {
+    fun print(self) {
+        putln(a)
+    }
+}

@@ -1,0 +1,8 @@
+a := || 1
+b := |a| a + 1
+c := |a| {
+    return a + 1
+}
+putln(a())
+putln(b(1))
+putln(c(2))

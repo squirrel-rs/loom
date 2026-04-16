@@ -1,0 +1,13 @@
+use mem
+
+putln(mem.total())
+putln(mem.used())
+putln(mem.free())
+putln(mem.total_swap())
+putln(mem.used_swap())
+putln(mem.free_swap())
+
+a := [1,2,3,4,5,6];
+putln(mem.size_of(a))
+putln(mem.size_of("Hello, world!"))
+putln(mem.align_of(a))

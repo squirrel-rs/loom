@@ -1,0 +1,5 @@
+use math
+
+putln(math.sin(1))
+putln(math.rnd(0.0, 1.0))
+putln(math.rnd(1, 10))

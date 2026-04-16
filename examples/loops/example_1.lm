@@ -1,0 +1,14 @@
+# Calculates factorial of `n`
+fun factorial(n) {
+    result := 1
+
+    for i in 1..=n {
+        result *= i
+    }
+
+    return result
+}
+
+# Example usage
+putln(factorial(10));
+putln(factorial(15));
