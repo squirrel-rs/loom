@@ -40,7 +40,7 @@ fn validate_one_path_arg<F, V>(span: &Span, values: &[Value], f: F) -> V
 where
     F: FnOnce(Utf8PathBuf) -> V,
 {
-    validate_path_arg(span, values, 0, |path| f(path))
+    validate_path_arg(span, values, 0, f)
 }
 
 /// Helper: validates two path arguments

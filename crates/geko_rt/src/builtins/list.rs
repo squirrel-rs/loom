@@ -42,7 +42,7 @@ fn validate_list_arg<F, V>(span: &Span, values: &[Value], f: F) -> V
 where
     F: FnOnce(&mut Vec<Value>) -> V,
 {
-    validate_list(span, values.get(0).cloned().unwrap(), f)
+    validate_list(span, values.first().cloned().unwrap(), f)
 }
 
 /// Helper: validates index

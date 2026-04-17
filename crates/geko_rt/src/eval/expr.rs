@@ -553,6 +553,9 @@ impl<'io> Interpreter<'io> {
 
     /// Evaluates dict expression
     fn eval_dict(&mut self, span: &Span, dict: &[(Expression, Expression)]) -> Flow<Value> {
+        // Note: Value implementation of Hash doesn’t
+        // access any of the interior mutable types, so it's a false positive
+        #[allow(clippy::mutable_key_type)]
         // Evaluating values before accessing dict
         let mut values_map = HashMap::new();
         for (a, b) in dict {

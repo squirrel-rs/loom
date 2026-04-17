@@ -159,7 +159,7 @@ fn validate_process_arg<F, V>(span: &Span, values: &[Value], f: F) -> V
 where
     F: FnOnce(&mut Child) -> V,
 {
-    validate_process(span, values.get(0).cloned().unwrap(), f)
+    validate_process(span, values.first().cloned().unwrap(), f)
 }
 
 /// `Process` init method

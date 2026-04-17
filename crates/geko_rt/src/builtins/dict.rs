@@ -43,7 +43,7 @@ fn validate_dict_arg<F, V>(span: &Span, values: &[Value], f: F) -> V
 where
     F: FnOnce(&mut HashMap<Value, Value>) -> V,
 {
-    validate_dict(span, values.get(0).cloned().unwrap(), f)
+    validate_dict(span, values.first().cloned().unwrap(), f)
 }
 
 /// Helper: makes new list
@@ -139,7 +139,7 @@ fn remove_method() -> Method {
         arity: 2,
         function: Box::new(|_, span, values| {
             validate_dict_arg(span, &values, |map| {
-                map.remove(&values.get(0).cloned().unwrap());
+                map.remove(&values.first().cloned().unwrap());
                 Value::Null
             })
         }),

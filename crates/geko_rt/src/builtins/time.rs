@@ -54,7 +54,7 @@ where
             match internal {
                 // Safety: borrow is temporal and short
                 Value::Any(time) => match time.borrow_mut().downcast_mut::<NaiveDateTime>() {
-                    Some(time) => f(time.clone()),
+                    Some(time) => f(*time),
                     _ => utils::error(span, "corrupted time"),
                 },
                 _ => {
@@ -79,7 +79,7 @@ fn validate_one_time_arg<F, V>(span: &Span, values: &[Value], f: F) -> V
 where
     F: FnOnce(NaiveDateTime) -> V,
 {
-    validate_time(span, values.get(0).cloned().unwrap(), f)
+    validate_time(span, values.first().cloned().unwrap(), f)
 }
 
 /// Helper: validates two time arguments
@@ -214,7 +214,7 @@ fn time_in_seconds_method() -> Method {
         arity: 1,
         function: Box::new(|_, span, values| {
             validate_one_time_arg(span, &values, |time| {
-                Value::Int(time.and_utc().timestamp() as i64)
+                Value::Int(time.and_utc().timestamp())
             })
         }),
     }))
@@ -226,7 +226,7 @@ fn time_in_millis_method() -> Method {
         arity: 1,
         function: Box::new(|_, span, values| {
             validate_one_time_arg(span, &values, |time| {
-                Value::Int(time.and_utc().timestamp_millis() as i64)
+                Value::Int(time.and_utc().timestamp_millis())
             })
         }),
     }))
@@ -794,7 +794,7 @@ fn utc() -> Ref<Native> {
 fn from_seconds() -> Ref<Native> {
     Ref::new(Native {
         arity: 1,
-        function: Box::new(|rt, span, values| match values.get(0).cloned().unwrap() {
+        function: Box::new(|rt, span, values| match values.first().cloned().unwrap() {
             Value::Int(seconds) => fresh_time(
                 rt,
                 span,
@@ -812,7 +812,7 @@ fn from_seconds() -> Ref<Native> {
 fn from_millis() -> Ref<Native> {
     Ref::new(Native {
         arity: 1,
-        function: Box::new(|rt, span, values| match values.get(0).cloned().unwrap() {
+        function: Box::new(|rt, span, values| match values.first().cloned().unwrap() {
             Value::Int(millis) => fresh_time(
                 rt,
                 span,
@@ -830,7 +830,7 @@ fn from_millis() -> Ref<Native> {
 fn from_nanos() -> Ref<Native> {
     Ref::new(Native {
         arity: 1,
-        function: Box::new(|rt, span, values| match values.get(0).cloned().unwrap() {
+        function: Box::new(|rt, span, values| match values.first().cloned().unwrap() {
             Value::Int(nanos) => fresh_time(
                 rt,
                 span,
