@@ -69,11 +69,17 @@ sandwich.cook()
 - [ ] `net/http` library
 - [ ] `net/tcp` library
 - [ ] `net/udp` library
+- [ ] `net/socket` library
+- [ ] `uuid` library
+- [ ] implement `shuffle` for list
 - [x] `crypto` library
 - [ ] `sys` library
 - [x] `process` library
 - [ ] use lasso for string interning
-- [ ] rework lambda syntax
+- [ ] rework anonymous functions syntax
+- [ ] implement `shuffle` for list
+- [ ] `ok` and `error` keywords
+- [ ] `todo` keyword
 - [x] implement anonymous functions
 - [x] extend for loop to iterate over items of list
 - [x] implement dictionaries
