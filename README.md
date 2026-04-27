@@ -71,7 +71,6 @@ sandwich.cook()
 - [ ] `net/udp` library
 - [ ] `net/socket` library
 - [ ] `uuid` library
-- [ ] implement `shuffle` for list
 - [x] `crypto` library
 - [ ] `sys` library
 - [x] `process` library
