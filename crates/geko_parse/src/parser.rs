@@ -589,23 +589,15 @@ impl<'s> Parser<'s> {
     }
 
     /// Anonymous function parsing
-    fn anon_fn(&mut self) -> Expression {
-        let start_span = self.peek().span.clone();
+    fn anon_fun_expr(&mut self) -> Expression {
+        let start_span = self.bump().span.clone();
 
         // Parsing function params
-        let params = if self.check(TokenKind::Bar) {
-            self.sep_by(TokenKind::Bar, TokenKind::Bar, TokenKind::Comma, |p| {
-                p.expect(TokenKind::Id).lexeme
-            })
-        } else {
-            self.expect(TokenKind::DoubleBar);
-            Vec::new()
-        };
+        let params = self.params();
 
         // Parsing function body
-        let block = if self.check(TokenKind::Lbrace) {
-            self.block()
-        } else {
+        let block = if self.check(TokenKind::Arrow) {
+            self.bump();
             let start_span = self.peek().span.clone();
             let expr = self.expr();
             let end_span = self.prev().span.clone();
@@ -617,6 +609,8 @@ impl<'s> Parser<'s> {
                     expr: Some(expr),
                 }],
             }
+        } else {
+            self.block()
         };
 
         let end_span = self.prev().span.clone();
@@ -628,7 +622,7 @@ impl<'s> Parser<'s> {
     }
 
     /// Atom expression parsing
-    fn atom(&mut self) -> Expression {
+    fn atom_expr(&mut self) -> Expression {
         let tk = self.peek().clone();
         match tk.kind {
             TokenKind::Lparen => self.group(),
@@ -667,7 +661,7 @@ impl<'s> Parser<'s> {
             TokenKind::Id => self.variable(),
             TokenKind::Lbracket => self.list(),
             TokenKind::Lbrace => self.dict(),
-            TokenKind::Bar | TokenKind::DoubleBar => self.anon_fn(),
+            TokenKind::Fun => self.anon_fun_expr(),
             _ => bail!(ParseError::UnexpectedExprToken {
                 got: tk.kind,
                 src: self.source.clone(),
@@ -693,7 +687,7 @@ impl<'s> Parser<'s> {
                 value: Box::new(value),
             };
         }
-        self.atom()
+        self.atom_expr()
     }
 
     /// Factor expression parsing

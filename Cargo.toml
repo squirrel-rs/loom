@@ -8,7 +8,8 @@ members = [
     "crates/geko_rt",
     "crates/geko_sema",
     "crates/geko_tests",
-    "crates/geko_wasm", "crates/geko_jit",
+    "crates/geko_wasm", 
+    "crates/geko_jit",
 ]
 resolver = "3"
 

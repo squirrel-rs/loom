@@ -215,12 +215,12 @@ bail "some text"
 ```
 
 ### Anonymous function
-`Geko` supports rust-like anonymous functions:
+`Geko` supports anonymous functions:
 
 ```geko
-a := || 1
-b := |a| a + 1
-c := |a| {
+a := fun() -> 1
+b := fun(a) -> a + 1
+c := fun(a) {
   return a + 1
 }
 putln(a())

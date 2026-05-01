@@ -46,6 +46,7 @@ pub enum TokenKind {
     Gt,          // >
     GtColon,     // >:
     GtBang,      // >!
+    Arrow,       // ->
     Lt,          // <
     Colon,       // :
     Walrus,      // :=
