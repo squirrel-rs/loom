@@ -1,3 +1,5 @@
+use std::f64::consts::{E, PI, TAU};
+
 /// Imports
 use crate::{
     builtins::utils,
@@ -583,6 +585,46 @@ fn rnd() -> Ref<Native> {
     }
 }
 
+/// Math sign
+fn sign() -> Ref<Native> {
+    native_fun! {
+        arity = 1,
+        fun = |_, span, values| {
+            match values.first().cloned().unwrap() {
+                Value::Float(float) => if float > 0.0 {
+                    Value::Int(1)
+                } else if float == 0.0 {
+                    Value::Int(0)
+                } else {
+                    Value::Int(-1)
+                },
+                Value::Int(int) => if int > 0 {
+                    Value::Int(1)
+                } else if int == 0 {
+                    Value::Int(0)
+                } else {
+                    Value::Int(-1)
+                },
+                _ => utils::error(span, "argument is expected to be a number"),
+            }
+        }
+    }
+}
+
+/// Math fract
+fn fract() -> Ref<Native> {
+    native_fun! {
+        arity = 1,
+        fun = |_, span, values| {
+            match values.first().cloned().unwrap() {
+                Value::Float(float) => Value::Float(float - float.round()),
+                Value::Int(_) => Value::Float(0.0),
+                _ => utils::error(span, "argument is expected to be a number"),
+            }
+        }
+    }
+}
+
 /// Provides `math` module env
 pub fn provide_env() -> RealmRef {
     realm! {
@@ -617,6 +659,11 @@ pub fn provide_env() -> RealmRef {
         round => callable!(round()),
         pow => callable!(pow()),
         hypot => callable!(hypot()),
-        rnd => callable!(rnd())
+        rnd => callable!(rnd()),
+        sign => callable!(sign()),
+        fract => callable!(fract()),
+        pi => Value::Float(PI),
+        tau => Value::Float(TAU),
+        e => Value::Float(E)
     }
 }
