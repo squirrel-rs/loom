@@ -49,7 +49,7 @@ impl IO for CliIO {
             Ok(cwd) => match Utf8PathBuf::from_path_buf(cwd.clone()) {
                 Ok(mut dir) => {
                     // Appending path to cwd
-                    dir.push(Utf8PathBuf::from(format!("{path}.ql")));
+                    dir.push(Utf8PathBuf::from(format!("{path}.gk")));
                     // If path exists
                     if dir.exists() {
                         Some(dir)
