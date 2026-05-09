@@ -80,6 +80,7 @@ sandwich.cook()
 - [ ] implement `shuffle` for list
 - [x] `ok` and `error` builtins
 - [x] `todo` builtin
+- [ ] `loop` keyword
 - [x] implement anonymous functions
 - [x] extend for loop to iterate over items of list
 - [x] implement dictionaries
