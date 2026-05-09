@@ -350,6 +350,63 @@ fn rename() -> Ref<Native> {
     }
 }
 
+/// Lock file
+fn lock() -> Ref<Native> {
+    native_fun! {
+        arity = 1,
+        fun = |_, span, values| {
+            validate_one_path_arg(span, &values, |path| {
+                if cfg!(target_family = "wasm") {
+                    bail!(IOError::NotSupported("lock"))
+                } else {
+                    match File::open(path).and_then(|it| it.lock()) {
+                        Ok(_) => Value::Null,
+                        Err(err) => utils::error(span, &format!("failed to lock file: `{err}`")),
+                    }
+                }
+            })
+        }
+    }
+}
+
+/// Shared lock file
+fn lock_shared() -> Ref<Native> {
+    native_fun! {
+        arity = 1,
+        fun = |_, span, values| {
+            validate_one_path_arg(span, &values, |path| {
+                if cfg!(target_family = "wasm") {
+                    bail!(IOError::NotSupported("lock"))
+                } else {
+                    match File::open(path).and_then(|it| it.lock_shared()) {
+                        Ok(_) => Value::Null,
+                        Err(err) => utils::error(span, &format!("failed to lock file: `{err}`")),
+                    }
+                }
+            })
+        }
+    }
+}
+
+/// Unlock file
+fn unlock() -> Ref<Native> {
+    native_fun! {
+        arity = 1,
+        fun = |_, span, values| {
+            validate_one_path_arg(span, &values, |path| {
+                if cfg!(target_family = "wasm") {
+                    bail!(IOError::NotSupported("lock"))
+                } else {
+                    match File::open(path).and_then(|it| it.unlock()) {
+                        Ok(_) => Value::Null,
+                        Err(err) => utils::error(span, &format!("failed to lock file: `{err}`")),
+                    }
+                }
+            })
+        }
+    }
+}
+
 /// Read file text
 fn read() -> Ref<Native> {
     native_fun! {
@@ -397,6 +454,9 @@ pub fn provide_env() -> RealmRef {
         copy => callable!(copy()),
         rename => callable!(rename()),
         read => callable!(read()),
-        write => callable!(write())
+        write => callable!(write()),
+        lock => callable!(lock()),
+        lock_shared => callable!(lock_shared()),
+        unlock => callable!(unlock())
     }
 }
