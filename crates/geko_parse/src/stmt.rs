@@ -305,6 +305,7 @@ impl<'s> Parser<'s> {
 
         while self.check(TokenKind::Slash) {
             self.bump();
+            path.push('/');
             path.push_str(&self.expect(TokenKind::Id).lexeme);
         }
 
