@@ -39,7 +39,11 @@ pub trait IO {
     /// Writes file
     fn write(&self, path: &Utf8PathBuf, text: String);
 
-    /// Resolves module by path
+    /// Resolves module path
+    ///
+    /// Returns `None` if path isn't exists or fs isn't available.
+    /// Otherwise returns `Some(Utf8PathBuf)`
+    ///
     fn resolve(&self, path: &str) -> Option<Utf8PathBuf>;
 
     /// Flushes stream
