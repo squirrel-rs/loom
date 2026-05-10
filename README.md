@@ -1,3 +1,5 @@
+<img width="226" height="101" alt="image" src="https://github.com/user-attachments/assets/163cbb6b-53c7-4a95-9e7f-509b3563dde4" />
+
 #### 🦎 Geko
 ... is a friendly, lightweight programming language for math and games
 
