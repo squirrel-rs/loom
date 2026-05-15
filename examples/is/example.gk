@@ -1,4 +1,4 @@
-use is
+use "is"
 
 putln(is.int(13))
 putln(is.float(13))

@@ -298,20 +298,6 @@ impl<'s> Parser<'s> {
         }
     }
 
-    /// Use path
-    fn use_path(&mut self) -> String {
-        let mut path = String::new();
-        path.push_str(&self.expect(TokenKind::Id).lexeme);
-
-        while self.check(TokenKind::Slash) {
-            self.bump();
-            path.push('/');
-            path.push_str(&self.expect(TokenKind::Id).lexeme);
-        }
-
-        path
-    }
-
     /// Use kind
     fn use_kind(&mut self) -> UseKind {
         if self.check(TokenKind::As) {
@@ -340,7 +326,7 @@ impl<'s> Parser<'s> {
     fn use_stmt(&mut self) -> Statement {
         let start_span = self.peek().span.clone();
         self.expect(TokenKind::Use);
-        let path = self.use_path();
+        let path = self.expect(TokenKind::String).lexeme;
         let kind = self.use_kind();
         let end_span = self.prev().span.clone();
 

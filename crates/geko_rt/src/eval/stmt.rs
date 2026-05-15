@@ -9,6 +9,7 @@ use crate::{
         value::{Callable, Class, Closure, Enum, Function, Method, Trait, TraitFunction, Value},
     },
 };
+use camino::Utf8PathBuf;
 use geko_common::{bail, bug};
 use geko_ir::{
     atom::{self, AssignOp, BinOp},
@@ -419,21 +420,34 @@ impl<'io> Interpreter<'io> {
     }
 
     /// Executes use
-    fn exec_use(&mut self, span: &Span, name: &str, kind: &UseKind) -> Flow<()> {
-        // Resolving use path
-        let module = {
-            // Resolving fs path
-            match self.io.resolve(name) {
-                Some(path) => self.interpret_module(name, &self.io.read(&path)),
-                None => match self.load_builtin_module(name) {
-                    Some(module) => module,
-                    None => bail!(RuntimeError::FailedToFindModule {
-                        name: name.to_string(),
-                        src: span.0.clone(),
-                        span: span.1.clone().into()
-                    }),
-                },
+    fn exec_use(&mut self, span: &Span, path: &str, kind: &UseKind) -> Flow<()> {
+        // Resolving module path
+        let path_to_module = if path.starts_with("@/") {
+            Some(
+                Utf8PathBuf::from(span.0.name())
+                    .join(&path[2..])
+                    .with_extension("gk"),
+            )
+        } else {
+            match self.io.cwd() {
+                Some(cwd) => Some(cwd.join(path).with_extension("gk")),
+                None => None,
             }
+        };
+
+        // Resolving module by path
+        let module = match path_to_module {
+            Some(path) if path.exists() => {
+                self.interpret_module(&path.to_string(), &self.io.read(&path))
+            }
+            _ => match self.load_builtin_module(&path.to_string()) {
+                Some(module) => module,
+                None => bail!(RuntimeError::FailedToFindModule {
+                    path: path.to_string(),
+                    src: span.0.clone(),
+                    span: span.1.clone().into()
+                }),
+            },
         };
 
         // Checking usage kind
@@ -482,7 +496,7 @@ impl<'io> Interpreter<'io> {
                 .realm
                 .borrow_mut()
                 // Safety: `split()` returns iterator with at least 1 element
-                .define(name.split("/").last().unwrap(), Value::Module(module)),
+                .define(path.split("/").last().unwrap(), Value::Module(module)),
         }
 
         Ok(())

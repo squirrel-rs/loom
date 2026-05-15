@@ -36,8 +36,8 @@ impl IO for WasmIO {
         bail!(IOError::NotSupported("write"));
     }
 
-    // Resolve implementation
-    fn resolve(&self, _: &str) -> Option<Utf8PathBuf> {
+    // Cwd implementation
+    fn cwd(&self) -> Option<Utf8PathBuf> {
         None
     }
 

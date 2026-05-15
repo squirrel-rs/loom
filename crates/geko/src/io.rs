@@ -5,7 +5,7 @@ use geko_common::{
     io::{IO, IOError},
 };
 use std::{
-    fs,
+    env, fs,
     io::{self, Write},
 };
 
@@ -41,32 +41,21 @@ impl IO for CliIO {
         }
     }
 
-    /// Resolve implementation
-    fn resolve(&self, path: &str) -> Option<Utf8PathBuf> {
-        // Retrieving current directory
-        match std::env::current_dir() {
-            // Note: from_path_buf with reference is not implemented.
-            Ok(cwd) => match Utf8PathBuf::from_path_buf(cwd.clone()) {
-                Ok(mut dir) => {
-                    // Appending path to cwd
-                    dir.push(Utf8PathBuf::from(format!("{path}.gk")));
-                    // If path exists
-                    if dir.exists() {
-                        Some(dir)
-                    }
-                    // If not
-                    else {
-                        None
-                    }
-                }
-                Err(_) => bail!(IOError::NonUtf8Path(cwd)),
-            },
-            Err(err) => bail!(IOError::CwdNotAvailable(err)),
-        }
-    }
-
     /// Flushes stream
     fn flush(&self) {
         let _ = io::stdout().flush();
+    }
+
+    /// Cwd implementation
+    fn cwd(&self) -> Option<Utf8PathBuf> {
+        // Matching current directory
+        match env::current_dir() {
+            // Note: from_path_buf is no implemented with reference
+            Ok(path) => match Utf8PathBuf::from_path_buf(path.clone()) {
+                Ok(path) => Some(path),
+                Err(_) => bail!(IOError::NonUtf8Path(path)),
+            },
+            Err(err) => bail!(IOError::CwdNotAvailable(err)),
+        }
     }
 }

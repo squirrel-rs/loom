@@ -1,5 +1,5 @@
 #[ Progress bar that erases only the last line ]#
-use process for sleep
+use "process" for sleep
 
 progress := 0
 while progress <= 100 {
@@ -19,7 +19,7 @@ while progress <= 100 {
     }
 
     if progress > 0 {
-        print("\x{1B}[1A\x{1B}[2K\x{1B}[G")
+        put("\x{1B}[1A\x{1B}[2K\x{1B}[G")
     }
 
     putln("🦄: [" + bar + spaces + "] " + str_of(progress) + "%")

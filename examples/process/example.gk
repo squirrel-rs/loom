@@ -1,4 +1,4 @@
-use process
+use "process"
 
 p := process.spawn("ls", ["-a"])
 putln(p.output())

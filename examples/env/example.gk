@@ -1,4 +1,4 @@
-use env
+use "env"
 
 env.set_var("path", "/home/antes/path")
 putln(env.get_var("path"))

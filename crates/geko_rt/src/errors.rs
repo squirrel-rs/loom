@@ -106,10 +106,10 @@ pub enum RuntimeError {
         span: SourceSpan,
     },
     /// Failed to find module
-    #[error("failed to find module `{name}`")]
+    #[error("failed to find module `{path}`")]
     #[diagnostic(code(rt::failed_to_find_module))]
     FailedToFindModule {
-        name: String,
+        path: String,
         #[source_code]
         src: Arc<NamedSource<String>>,
         #[label("here...")]
